@@ -70,4 +70,6 @@ Asset conventions (see HANDOFF.md for details): GLB from Blender, transforms app
 exported with **+Y Up**, nose toward Blender **−Y** (= game +Z after export), vertex
 colors, real game-unit scale (player biplane = 11.6 units wingspan), moving parts as
 named child objects (`prop` single / `prop1..n` multi, `turret` / `turret1..3`,
-`leg*`, `limb*`, `eye`) with origins on their pivots.
+`leg*`, `limb*`, `eye`, `ring`) with origins on their pivots. A node named `ring`
+(saucers) is rendered unlit (glow) and spun around Y; `eye` and `ring` get
+per-instance materials since the game animates their colors.

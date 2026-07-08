@@ -4,20 +4,27 @@
    manifest; anything missing or failing falls back to the builder above.
    Conventions (fixed with the author): Y-up, nose along +Z, colors baked as vertex
    colors, real game-unit scale, moving parts as named child objects (prop, turret…). */
-const ASSETS={ biplane_player:'assets/biplane_player.glb' };
-const ASSET_SPAN={ biplane_player:11.6 }; // expected bbox width (wingspan) in game units
+const ASSETS={
+  biplane_player:'assets/biplane_player.glb',
+  biplane_enemy:'assets/enemy_fighter.glb',
+  bomber:'assets/enemy_bomber.glb',
+  saucer_s:'assets/enemy_saucer.glb'
+};
+const ASSET_SPAN={ biplane_player:11.6, biplane_enemy:11.2, bomber:30, saucer_s:10 }; // expected bbox width in game units
 const GLB={}; // key -> normalized template scene; cloned per spawn by makeUnit()
 function normalizeGLB(key,root){
   root.traverse(o=>{
     if(o.isMesh){
       const src=o.material;
-      o.material=new THREE.MeshPhongMaterial({
-        flatShading:true,shininess:6,
+      const glow=/^ring/.test((o.name||'').toLowerCase()); // unlit energy parts (saucer ring)
+      const common={
         vertexColors:!!o.geometry.attributes.color,
         map:(src&&src.map)||null,
         color:src&&src.color?src.color.clone():new THREE.Color(0xffffff)
-      });
-      o.castShadow=true;o.receiveShadow=true;
+      };
+      o.material=glow?new THREE.MeshBasicMaterial(common)
+                     :new THREE.MeshPhongMaterial(Object.assign({flatShading:true,shininess:6},common));
+      o.castShadow=!glow;o.receiveShadow=!glow;
     }
     o.userData={}; // Object3D.clone deep-copies userData via JSON; keep templates clean
   });
@@ -27,8 +34,9 @@ function normalizeGLB(key,root){
   if(span){
     if(size.x<span*0.55||size.x>span*1.8)
       console.warn(`[assets] ${key}: width ${size.x.toFixed(2)} deviates wildly from expected wingspan ~${span}. Not auto-rescaling - fix the export.`);
-    // aircraft sanity: wingspan along X should dominate, height along Y should be smallest
-    if(size.y>=size.z||size.z>size.x)
+    // aircraft sanity: wingspan along X should dominate, height along Y should be smallest.
+    // 10% slack so round/square footprints (saucers) don't false-positive
+    if(size.y>size.z*1.1||size.z>size.x*1.1)
       console.warn(`[assets] ${key}: proportions look rotated (expect W > L > H for an aircraft, got `
         +`${size.x.toFixed(1)}/${size.z.toFixed(1)}/${size.y.toFixed(1)}). Check the export: nose along +Z, up +Y `
         +`(Blender: model nose toward -Y, export glTF with +Y Up, transforms applied). Not auto-rotating - fix the export.`);
@@ -46,12 +54,17 @@ function mapParts(root){ // named nodes -> userData, matching the procedural bui
     else if(/^leg/.test(n))legs.push(o);
     else if(/^limb/.test(n))limbs.push(o);
     else if(n==='eye')ud.eye=o;
+    else if(n==='ring')ud.ring=o;
   });
   const byName=(a,b)=>a.name<b.name?-1:1;
   if(props.length)ud.props=props.sort(byName);
   if(turrets.length)ud.turrets=turrets.sort(byName);
   if(legs.length)ud.legs=legs.sort(byName);
   if(limbs.length)ud.limbs=limbs.sort(byName);
+  // per-instance materials for parts whose color is animated at runtime (tripod eye);
+  // also keeps authored glow parts isolated from the shared-material tint quirk
+  for(const part of [ud.eye,ud.ring])
+    if(part&&part.isMesh&&part.material)part.material=part.material.clone();
   return root;
 }
 function makeUnit(key,fallback){ // no skinning anywhere, so a plain deep clone is fine
