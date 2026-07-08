@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TINY ACES — a miniature air war</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="xh"><div class="r"></div><div class="l h"></div><div class="l v"></div><div class="d"></div></div>
+<div id="dmg"></div>
+<div id="hud">
+  <div class="hud-tl">
+    <div class="lbl">Airframe</div>
+    <div id="hpbar"><div id="hpfill"></div></div>
+    <div id="weap"></div>
+    <div id="pubar"></div>
+  </div>
+  <div class="hud-tr">
+    <div class="lbl">Score</div>
+    <div class="big" id="score">0</div>
+    <div id="objective"></div>
+  </div>
+  <div id="bossbar"><div class="lbl" id="bossname"></div><div id="bossfill-wrap"><div id="bossfill"></div></div></div>
+  <div class="hud-bc"><div id="hint">LMB fire &nbsp;·&nbsp; RMB boost &nbsp;·&nbsp; MMB / Q immelmann &nbsp;·&nbsp; WASD stunt &nbsp;·&nbsp; ESC pause</div></div>
+  <div id="arrow"><span></span><b id="arrowd"></b></div>
+</div>
+<div id="pops"></div>
+<div id="announce"><div class="a1"></div><div class="a2"></div></div>
+<div id="screen"></div>
+<div id="err"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- non-module examples/js build matching three.min.js r128; cdnjs does not mirror examples/ -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<!-- game modules: classic scripts sharing one global scope; load order matters -->
+<script src="js/01-utils.js"></script>
+<script src="js/02-audio.js"></script>
+<script src="js/03-renderer.js"></script>
+<script src="js/04-input.js"></script>
+<script src="js/05-builder.js"></script>
+<script src="js/06-particles.js"></script>
+<script src="js/07-popups.js"></script>
+<script src="js/08-projectiles.js"></script>
+<script src="js/09-models.js"></script>
+<script src="js/10-assets.js"></script>
+<script src="js/11-state.js"></script>
+<script src="js/12-terrain.js"></script>
+<script src="js/13-gen-verdun.js"></script>
+<script src="js/14-gen-islands.js"></script>
+<script src="js/15-gen-visitors.js"></script>
+<script src="js/16-enemies.js"></script>
+<script src="js/17-combat.js"></script>
+<script src="js/18-powerups.js"></script>
+<script src="js/19-player.js"></script>
+<script src="js/20-levels.js"></script>
+<script src="js/21-menu.js"></script>
+<script src="js/22-hud.js"></script>
+<script src="js/23-main.js"></script>
+</body>
+</html>
